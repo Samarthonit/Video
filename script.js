@@ -85,17 +85,23 @@ document.getElementById("stopBtn").onclick = stopRecording;
 document.getElementById("shareBtn").onclick = shareRecording;
 
 async function initCamera() {
-    try {
-        mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        camera.srcObject = mediaStream;
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    camera.srcObject = mediaStream;
 
-        camera.onloadedmetadata = () => {
-            camera.style.width = "100%";
-            camera.style.height = "auto";
-        };
-    } catch (e) {
-        errorEl.textContent = "Camera access denied or not available.";
-    }
+    camera.onloadedmetadata = () => {
+      const aspectRatio = camera.videoWidth / camera.videoHeight;
+
+      // Make the video responsive but preserve the actual camera aspect ratio
+      camera.style.width = "100%";
+      camera.style.height = `${camera.offsetWidth / aspectRatio}px`;
+    };
+  } catch (e) {
+    errorEl.textContent = "Camera access denied or not available.";
+  }
 }
 
+
 initCamera();
+
+
