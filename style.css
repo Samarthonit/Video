@@ -25,15 +25,12 @@
         background: black;
         border-radius: 10px;
         overflow: hidden;
-        padding-top: 56.25%;
     }
 
     .video-wrapper video {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        object-fit: cover;
+        width: 100%;
+        height: auto;
+        display: block;
     }
 
     button {
@@ -49,34 +46,37 @@
     #startBtn {
         background-color: rgb(0, 202, 0);
         cursor: pointer;
-        transition:all 0.3s ease;
+        transition: all 0.3s ease;
         box-shadow: 0 0 50px 1px green;
     }
-    #startBtn:hover{
+
+    #startBtn:hover {
         background-color: green;
-        transform:scale(1.1);
+        transform: scale(1.1);
     }
 
     #stopBtn {
         background-color: rgb(214, 28, 3);
         cursor: pointer;
-        transition:all 0.3s ease;
+        transition: all 0.3s ease;
         box-shadow: 0 0 50px 1px rgb(151, 12, 5);
     }
-    #stopBtn:hover{
+
+    #stopBtn:hover {
         background-color: rgb(104, 7, 0);
-        transform:scale(1.1);
+        transform: scale(1.1);
     }
 
-      #shareBtn {
+    #shareBtn {
         background-color: rgb(2, 100, 212);
         cursor: pointer;
-        transition:all 0.3s ease;
+        transition: all 0.3s ease;
         box-shadow: 0 0 50px 1px rgb(7, 137, 198);
     }
-    #shareBtn:hover{
+
+    #shareBtn:hover {
         background-color: rgb(4, 59, 107);
-        transform:scale(1.1);
+        transform: scale(1.1);
     }
 
     .error {
