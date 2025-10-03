@@ -1,0 +1,121 @@
+    body {
+        font-family: sans-serif;
+        background: #ffffff;
+        margin: 0;
+        padding: 1rem;
+        display: flex;
+        justify-content: center;
+        background-color: #1f1f1f;
+    }
+
+    .container {
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+        color: white;
+    }
+
+    video {
+        width: 100%;
+        border-radius: 10px;
+    }
+
+    .video-wrapper {
+        position: relative;
+        background: black;
+        border-radius: 10px;
+        overflow: hidden;
+        padding-top: 56.25%;
+    }
+
+    .video-wrapper video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    button {
+        padding: 0.8rem 1.9rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        color: rgb(255, 255, 255);
+        font-size: 1rem;
+        margin: 0.9rem;
+    }
+
+    #startBtn {
+        background-color: rgb(0, 202, 0);
+        cursor: pointer;
+        transition:all 0.3s ease;
+        box-shadow: 0 0 50px 1px green;
+    }
+    #startBtn:hover{
+        background-color: green;
+        transform:scale(1.1);
+    }
+
+    #stopBtn {
+        background-color: rgb(214, 28, 3);
+        cursor: pointer;
+        transition:all 0.3s ease;
+        box-shadow: 0 0 50px 1px rgb(151, 12, 5);
+    }
+    #stopBtn:hover{
+        background-color: rgb(104, 7, 0);
+        transform:scale(1.1);
+    }
+
+      #shareBtn {
+        background-color: rgb(2, 100, 212);
+        cursor: pointer;
+        transition:all 0.3s ease;
+        box-shadow: 0 0 50px 1px rgb(7, 137, 198);
+    }
+    #shareBtn:hover{
+        background-color: rgb(4, 59, 107);
+        transform:scale(1.1);
+    }
+
+    .error {
+        color: red;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+
+    .recording-indicator {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        display: flex;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+    }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: red;
+        margin-right: 6px;
+        animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+
+        0%,
+        50% {
+            opacity: 1;
+        }
+
+        51%,
+        100% {
+            opacity: 0.3;
+        }
+    }
