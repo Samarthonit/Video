@@ -21,8 +21,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 10px;
+            justify-content: flex-start;
+            padding: 8px;
             overflow-x: hidden;
         }
 
@@ -32,59 +32,23 @@
             text-align: center;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
-        .header {
-            text-align: center;
-            padding: 10px;
-            background: linear-gradient(to right, #ff6b6b, #ff8e8e);
-            border-radius: 10px;
-            margin-bottom: 5px;
-        }
-
-        .month-year {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .event-title {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin: 8px 0;
-            line-height: 1.2;
-        }
-
-        .event-subtitle {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin: 8px 0;
-        }
-
-        .event-host {
-            margin-top: 8px;
-            font-size: 1.1rem;
-        }
-
-        .event-host ul {
-            list-style: none;
-            margin-top: 5px;
-        }
-
-        .event-host li {
-            margin: 5px 0;
-            font-weight: 600;
+        h1 {
+            margin: 3px 0;
+            font-size: 1.3rem;
+            color: #ff6b6b;
         }
 
         .recorder-container {
             position: relative;
             width: 100%;
-            border-radius: 10px;
+            border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
             background-color: #000;
-            aspect-ratio: 9/14; /* Reduced height ratio */
+            aspect-ratio: 9/16; /* Maintain frame aspect ratio */
         }
 
         #frame {
@@ -110,10 +74,10 @@
         /* --- Webcam visible area --- */
         .webcam-area {
             position: absolute;
-            top: 20%; /* Adjusted position */
+            top: 25%;
             left: 10%;
             width: 80%;
-            height: 40%; /* Reduced height */
+            height: 45%;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
@@ -125,45 +89,6 @@
             object-fit: cover;
             border-radius: 8px;
             background-color: #000;
-        }
-
-        .timer-container {
-            margin: 0;
-            font-size: 1.1rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 15px;
-            border-radius: 15px;
-        }
-
-        .recording-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            background-color: #f44336;
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(0.9);
-                opacity: 0.7;
-            }
-
-            50% {
-                transform: scale(1.2);
-                opacity: 1;
-            }
-
-            100% {
-                transform: scale(0.9);
-                opacity: 0.7;
-            }
         }
 
         .controls {
@@ -238,6 +163,45 @@
             opacity: 0.7;
         }
 
+        .timer-container {
+            margin: 3px 0;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 15px;
+        }
+
+        .recording-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background-color: #f44336;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.9);
+                opacity: 0.7;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0.9);
+                opacity: 0.7;
+            }
+        }
+
         .status {
             margin: 0;
             padding: 10px;
@@ -278,42 +242,29 @@
         /* --- Mobile optimization --- */
         @media (max-width: 600px) {
             body {
-                padding: 8px;
-                justify-content: center;
+                padding: 6px;
+                justify-content: flex-start;
             }
 
             .container {
-                gap: 10px;
+                gap: 8px;
             }
 
-            .header {
-                padding: 8px;
-            }
-
-            .month-year {
-                font-size: 1.3rem;
-            }
-
-            .event-title {
-                font-size: 1.6rem;
-            }
-
-            .event-subtitle {
+            h1 {
                 font-size: 1.2rem;
-            }
-
-            .event-host {
-                font-size: 1rem;
+                margin-bottom: 0;
             }
 
             .recorder-container {
-                border-radius: 8px;
-                aspect-ratio: 9/13; /* Further reduced for small screens */
+                border-radius: 10px;
             }
 
             .webcam-area {
-                top: 18%;
-                height: 38%;
+                top: 25%;
+                left: 10%;
+                width: 80%;
+                height: 45%;
+                border-radius: 6px;
             }
 
             .controls {
@@ -350,40 +301,15 @@
         /* Small mobile devices */
         @media (max-width: 400px) {
             body {
-                padding: 6px;
+                padding: 5px;
             }
 
             .container {
-                gap: 8px;
+                gap: 6px;
             }
 
-            .header {
-                padding: 6px;
-            }
-
-            .month-year {
-                font-size: 1.2rem;
-            }
-
-            .event-title {
-                font-size: 1.4rem;
-            }
-
-            .event-subtitle {
+            h1 {
                 font-size: 1.1rem;
-            }
-
-            .event-host {
-                font-size: 0.9rem;
-            }
-
-            .recorder-container {
-                aspect-ratio: 9/12; /* Even smaller for very small screens */
-            }
-
-            .webcam-area {
-                top: 15%;
-                height: 35%;
             }
 
             .btn {
@@ -433,13 +359,16 @@
                 font-size: 0.75rem;
             }
 
-            .recorder-container {
-                aspect-ratio: 9/11;
+            h1 {
+                font-size: 1rem;
             }
 
-            .webcam-area {
-                top: 12%;
-                height: 32%;
+            .timer-container {
+                font-size: 0.9rem;
+            }
+
+            .status {
+                font-size: 0.7rem;
             }
         }
 
@@ -455,8 +384,7 @@
             }
             
             .recorder-container {
-                max-height: 50vh;
-                aspect-ratio: 16/9;
+                max-height: 60vh;
             }
             
             .controls {
@@ -480,26 +408,9 @@
 
 <body>
     <div class="container">
-        <div class="header">
-            <div class="month-year">JANUARY, 2025</div>
-            <div class="event-title">RUN FOR GIRL CHILD</div>
-            <div class="event-subtitle">SUBAT - 21K | 10K | 15K | 12K</div>
-            <div class="event-host">
-                Event By
-                <ul>
-                    <li>Dr. Medgewar's</li>
-                </ul>
-            </div>
-        </div>
 
         <div class="recorder-container">
-            <!-- Placeholder for frame image -->
-            <div id="frame" style="background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem;">
-                <div style="text-align: center;">
-                    <i class="fas fa-camera" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                    <div>Event Frame</div>
-                </div>
-            </div>
+            <img id="frame" src="frame.png" alt="Frame" />
             <div class="webcam-area">
                 <video id="webcam" class="webcam-feed" autoplay muted playsinline></video>
             </div>
@@ -602,16 +513,6 @@
             } catch (err) {
                 console.error('Error accessing webcam:', err);
                 status.textContent = 'Error accessing webcam: ' + err.message;
-                
-                // Create a placeholder for demo purposes
-                const placeholderStream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: 640, height: 480 }
-                }).catch(() => null);
-                
-                if (placeholderStream) {
-                    webcam.srcObject = placeholderStream;
-                    setupCanvas();
-                }
             }
         }
 
@@ -633,9 +534,7 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             // Draw the frame (background with all design elements)
-            // In a real implementation, this would be the actual frame image
-            ctx.fillStyle = '#2d2d2d';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
             
             // Draw webcam in the exact same position as shown on webpage
             if (webcam.readyState >= 2) {
@@ -716,7 +615,7 @@
             recordingStartTime = Date.now();
             
             const canvasStream = canvas.captureStream(30);
-            const audioTrack = stream ? stream.getAudioTracks()[0] : null;
+            const audioTrack = stream.getAudioTracks()[0];
             if (audioTrack) canvasStream.addTrack(audioTrack);
             
             const mimeType = getSupportedMimeType();
