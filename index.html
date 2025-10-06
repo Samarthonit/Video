@@ -314,7 +314,6 @@
 
 <body>
     <div class="container">
-        <h1>Run For Girl Child</h1>
 
         <div class="recorder-container">
             <img id="frame" src="frame.png" alt="Frame" />
@@ -359,6 +358,7 @@
         let mediaRecorder, recordedChunks = [], stream = null, recordingBlob = null, timerInterval;
         let seconds = 0, minutes = 0, hours = 0;
         let isRecording = false;
+        let recordingStartTime = 0;
 
         // Function to get supported MIME types with MP4 priority
         function getSupportedMimeType() {
@@ -385,12 +385,13 @@
                     video: { 
                         width: { ideal: 1280 },
                         height: { ideal: 720 },
-                        frameRate: { ideal: 30 }
+                        frameRate: { ideal: 30, max: 30 }
                     },
                     audio: {
                         echoCancellation: true,
                         noiseSuppression: true,
-                        sampleRate: 44100
+                        sampleRate: 44100,
+                        channelCount: 2
                     }
                 });
 
@@ -464,10 +465,10 @@
             // If already recording, stop current recording first
             if (isRecording) {
                 stopRecording();
-                // Small delay to ensure previous recording is properly stopped
+                // Wait a bit before starting new recording
                 setTimeout(() => {
                     startNewRecording();
-                }, 100);
+                }, 500);
             } else {
                 startNewRecording();
             }
@@ -477,6 +478,7 @@
             // Reset timer and recording data
             resetTimer();
             recordedChunks = [];
+            recordingStartTime = Date.now();
             
             const canvasStream = canvas.captureStream(30);
             const audioTrack = stream.getAudioTracks()[0];
@@ -486,45 +488,77 @@
             const mimeType = getSupportedMimeType();
             const isMp4 = mimeType.includes('mp4');
             
-            // For Vivo devices, use lower bitrate and specific settings
+            // For Vivo devices, use specific settings
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            const bitrate = isMobile ? 2000000 : 5000000; // Lower bitrate for mobile
+            const bitrate = isMobile ? 2500000 : 5000000;
             
-            mediaRecorder = new MediaRecorder(canvasStream, {
-                mimeType: mimeType,
-                videoBitsPerSecond: bitrate,
-                audioBitsPerSecond: 128000
-            });
-
-            mediaRecorder.ondataavailable = e => { 
-                if (e.data.size > 0) {
-                    recordedChunks.push(e.data);
-                    console.log('Data chunk received:', e.data.size, 'bytes');
-                }
-            };
+            console.log('Starting recording with MIME type:', mimeType);
+            console.log('Bitrate:', bitrate);
             
-            mediaRecorder.onstop = () => {
-                const blobType = isMp4 ? 'video/mp4' : 'video/webm';
-                recordingBlob = new Blob(recordedChunks, { type: blobType });
-                downloadBtn.disabled = false;
-                shareBtn.disabled = false;
-                status.textContent = `Recording complete (${isMp4 ? 'MP4' : 'WebM'}). Size: ${(recordingBlob.size / (1024 * 1024)).toFixed(2)}MB`;
-                isRecording = false;
-                console.log('Recording stopped. Total size:', recordingBlob.size, 'bytes');
-            };
+            try {
+                mediaRecorder = new MediaRecorder(canvasStream, {
+                    mimeType: mimeType,
+                    videoBitsPerSecond: bitrate,
+                    audioBitsPerSecond: 128000
+                });
 
-            // Start recording with timeslice for better mobile compatibility
-            mediaRecorder.start(1000); // Collect data every second
-            startBtn.disabled = true; 
-            stopBtn.disabled = false;
-            recordingIndicator.style.display = 'inline-block';
-            timerInterval = setInterval(updateTimer, 1000);
-            status.textContent = 'Recording in progress...';
-            isRecording = true;
+                mediaRecorder.ondataavailable = handleDataAvailable;
+                
+                mediaRecorder.onstop = handleStop;
+                
+                mediaRecorder.onerror = (event) => {
+                    console.error('MediaRecorder error:', event.error);
+                    status.textContent = 'Recording error: ' + event.error;
+                };
+
+                // For Vivo devices, don't use timeslice - let MediaRecorder decide
+                mediaRecorder.start();
+                
+                startBtn.disabled = true; 
+                stopBtn.disabled = false;
+                recordingIndicator.style.display = 'inline-block';
+                timerInterval = setInterval(updateTimer, 1000);
+                status.textContent = 'Recording in progress...';
+                isRecording = true;
+                
+                console.log('Recording started successfully');
+                
+            } catch (error) {
+                console.error('Error starting recording:', error);
+                status.textContent = 'Error starting recording: ' + error.message;
+            }
+        }
+
+        function handleDataAvailable(event) {
+            if (event.data && event.data.size > 0) {
+                recordedChunks.push(event.data);
+                console.log('Data chunk received:', event.data.size, 'bytes, total chunks:', recordedChunks.length);
+            }
+        }
+
+        function handleStop() {
+            const recordingEndTime = Date.now();
+            const recordingDuration = (recordingEndTime - recordingStartTime) / 1000;
+            console.log('Recording stopped. Actual duration:', recordingDuration, 'seconds');
+            
+            const isMp4 = mediaRecorder.mimeType.includes('mp4');
+            const blobType = isMp4 ? 'video/mp4' : 'video/webm';
+            
+            // Create blob from all chunks
+            recordingBlob = new Blob(recordedChunks, { type: blobType });
+            
+            console.log('Final blob size:', recordingBlob.size, 'bytes');
+            console.log('Expected duration based on timer:', hours + ':' + minutes + ':' + seconds);
+            
+            downloadBtn.disabled = false;
+            shareBtn.disabled = false;
+            status.textContent = `Recording complete (${isMp4 ? 'MP4' : 'WebM'}). Duration: ${Math.round(recordingDuration)}s, Size: ${(recordingBlob.size / (1024 * 1024)).toFixed(2)}MB`;
+            isRecording = false;
         }
 
         function stopRecording() {
             if (mediaRecorder && mediaRecorder.state === 'recording') {
+                console.log('Stopping recording...');
                 mediaRecorder.stop();
                 clearInterval(timerInterval);
                 recordingIndicator.style.display = 'none';
@@ -541,13 +575,13 @@
                 const url = URL.createObjectURL(recordingBlob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `Run_For_Girl_Child_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.${extension}`;
+                a.download = `Run_For_Girl_Child_${Date.now()}.${extension}`;
 
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 
-                // Revoke the URL after a delay to ensure download completes
+                // Revoke the URL after a delay
                 setTimeout(() => {
                     URL.revokeObjectURL(url);
                 }, 1000);
