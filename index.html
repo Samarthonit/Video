@@ -2,16 +2,16 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Run For Girl Child</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* ----- Existing CSS (unchanged) ----- */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
         }
 
         body {
@@ -21,31 +21,29 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            padding: 10px;
+            padding: 20px;
         }
 
         .container {
+            max-width: 800px;
             width: 100%;
-            max-width: 480px;
             text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
         }
 
         h1 {
-            margin: 5px 0;
-            font-size: 1.5rem;
-            color: #ff6b6b;
+            margin: 20px 0;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .recorder-container {
             position: relative;
             width: 100%;
+            max-width: 640px;
+            margin: 0 auto;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             background-color: #000;
         }
 
@@ -68,13 +66,12 @@
             display: none;
         }
 
-        /* --- Webcam visible area - MOVED UP --- */
         .webcam-area {
             position: absolute;
-            top: 25%; /* Changed from 30% to 25% to move camera up */
-            left: 10%;
-            width: 80%;
-            height: 45%;
+            top: 25%;
+            left: 20%;
+            width: 60%;
+            height: 35%;
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
@@ -83,30 +80,29 @@
         .controls {
             display: flex;
             justify-content: center;
-            gap: 8px;
-            margin: 0;
+            gap: 15px;
+            margin: 25px 0;
             flex-wrap: wrap;
         }
 
         .btn {
-            padding: 10px 16px;
+            padding: 12px 25px;
             border: none;
-            border-radius: 40px;
-            font-size: 0.9rem;
+            border-radius: 50px;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all .3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            flex: 1;
-            min-width: 0;
-            max-width: 140px;
+            gap: 8px;
+            min-width: 140px;
         }
 
         .btn i {
-            font-size: 0.9rem;
+            font-size: 1.2rem;
         }
 
         .btn-start {
@@ -130,8 +126,8 @@
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
 
         .btn:active {
@@ -139,29 +135,26 @@
         }
 
         .btn:disabled {
-            background-color: #555;
+            background-color: #ccc;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
 
         .timer-container {
-            margin: 5px 0;
-            font-size: 1.2rem;
+            margin: 20px 0;
+            font-size: 1.5rem;
             font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 16px;
-            border-radius: 20px;
         }
 
         .recording-indicator {
             display: inline-block;
-            width: 12px;
-            height: 12px;
+            width: 15px;
+            height: 15px;
             background-color: #f44336;
             border-radius: 50%;
             animation: pulse 1.5s infinite;
@@ -185,12 +178,11 @@
         }
 
         .status {
-            margin: 0;
+            margin: 15px 0;
             padding: 10px;
             border-radius: 8px;
             background-color: rgba(255, 255, 255, 0.1);
-            font-size: 0.9rem;
-            border-left: 3px solid #ff6b6b;
+            font-size: 1rem;
         }
 
         .download-notification {
@@ -199,11 +191,12 @@
             right: 20px;
             background: #4CAF50;
             color: white;
-            padding: 10px 15px;
+            padding: 15px 20px;
             border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
             display: none;
             animation: slideIn .3s ease;
-            z-index: 1000;
         }
 
         @keyframes slideIn {
@@ -218,78 +211,31 @@
             }
         }
 
-        /* --- Mobile optimization --- */
-        @media (max-width: 600px) {
-            body {
-                justify-content: flex-start;
-                padding: 8px;
-                min-height: 100vh;
-                height: auto;
-            }
-
-            .container {
-                max-width: 100%;
-                gap: 10px;
-            }
-
+        @media(max-width:600px) {
             h1 {
-                font-size: 1.3rem;
-                margin-bottom: 0;
-            }
-
-            .webcam-area {
-                top: 27%; /* Adjusted for mobile - moved up */
-                left: 10%;
-                width: 80%;
-                height: 43%;
-            }
-
-            .controls {
-                gap: 6px;
-                flex-wrap: nowrap;
+                font-size: 1.8rem;
             }
 
             .btn {
-                padding: 8px 12px;
-                font-size: 0.85rem;
-                min-width: 0;
-                max-width: none;
+                padding: 10px 20px;
+                font-size: .9rem;
+                min-width: 120px;
             }
 
             .timer-container {
-                font-size: 1.1rem;
-                padding: 6px 14px;
-            }
-            
-            .status {
-                font-size: 0.85rem;
-                padding: 8px;
-            }
-        }
-
-        /* For very small screens */
-        @media (max-width: 350px) {
-            .btn {
-                padding: 6px 10px;
-                font-size: 0.8rem;
-            }
-            
-            .btn i {
-                font-size: 0.8rem;
-            }
-            
-            .timer-container {
-                font-size: 1rem;
+                font-size: 1.2rem;
             }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
     <div class="container">
+        <h1>Run For Girl Child</h1>
 
         <div class="recorder-container">
-            <img id="frame" src="frame.png" alt="Frame" />
+            <img id="frame" src="frame.png" alt="Frame">
             <div class="webcam-area">
                 <video id="webcam" autoplay muted playsinline></video>
             </div>
@@ -329,14 +275,50 @@
         const downloadNotification = document.getElementById('downloadNotification');
 
         let mediaRecorder, recordedChunks = [], stream = null, recordingBlob = null, timerInterval;
-        let seconds = 0, minutes = 0, hours = 0;
-        let isRecording = false;
+        let seconds = 0, minutes = 0, hours = 0, isRecording = false;
 
-        // Function to get supported MIME types with MP4 priority
+        // Initialize webcam
+        async function initWebcam() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        frameRate: { ideal: 30 }
+                    }, 
+                    audio: true 
+                });
+                webcam.srcObject = stream;
+                canvas.getContext('2d');
+                requestAnimationFrame(drawComposite);
+                status.textContent = 'Webcam ready. Click "Start" to record.';
+            } catch (err) {
+                status.textContent = 'Error accessing webcam: ' + err.message;
+            }
+        }
+
+        // Draw webcam + frame
+        function drawComposite() {
+            const ctx = canvas.getContext('2d');
+            canvas.width = frame.width || 640;
+            canvas.height = frame.height || 480;
+            ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
+            const wx = canvas.width * 0.2, wy = canvas.height * 0.25, ww = canvas.width * 0.6, wh = canvas.height * 0.35;
+            if (webcam.readyState >= 2) ctx.drawImage(webcam, wx, wy, ww, wh);
+            requestAnimationFrame(drawComposite);
+        }
+
+        // Timer
+        function updateTimer() {
+            seconds++;
+            if (seconds >= 60) { seconds = 0; minutes++; if (minutes >= 60) { minutes = 0; hours++; } }
+            timer.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        // Get supported MIME type - prioritize MP4
         function getSupportedMimeType() {
             const types = [
-                'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
-                'video/mp4; codecs="avc1.428028, mp4a.40.2"',
+                'video/mp4; codecs="avc1.42E01E, mp4a.40.2"', // MP4 with H.264 and AAC
                 'video/webm; codecs="vp9, opus"',
                 'video/webm; codecs="vp8, opus"',
                 'video/webm'
@@ -344,95 +326,16 @@
             
             for (let type of types) {
                 if (MediaRecorder.isTypeSupported(type)) {
-                    console.log('Supported MIME type:', type);
+                    console.log('Using MIME type:', type);
                     return type;
                 }
             }
-            return 'video/webm';
+            return 'video/webm'; // Fallback
         }
 
-        async function initWebcam() {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: { ideal: 1280 }, height: { ideal: 720 } },
-                    audio: true
-                });
-
-                webcam.srcObject = stream;
-                
-                // Set up canvas with proper dimensions
-                setupCanvas();
-                
-                status.textContent = 'Webcam ready. Click "Start" to record.';
-            } catch (err) {
-                status.textContent = 'Error accessing webcam: ' + err.message;
-            }
-        }
-
-        function setupCanvas() {
-            const ctx = canvas.getContext('2d');
-            
-            // Set canvas to match the frame dimensions
-            canvas.width = frame.offsetWidth;
-            canvas.height = frame.offsetHeight;
-            
-            console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
-            
-            // Start the composite drawing
-            requestAnimationFrame(drawComposite);
-        }
-
-        function drawComposite() {
-            const ctx = canvas.getContext('2d');
-            
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw the frame (background with all design elements)
-            ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
-            
-            // Draw webcam in the exact same position as shown on webpage
-            if (webcam.readyState >= 2) {
-                const webcamArea = document.querySelector('.webcam-area');
-                const rect = webcamArea.getBoundingClientRect();
-                const containerRect = frame.getBoundingClientRect();
-                
-                // Calculate relative position within the frame
-                const relativeX = (rect.left - containerRect.left) * (canvas.width / containerRect.width);
-                const relativeY = (rect.top - containerRect.top) * (canvas.height / containerRect.height);
-                const relativeWidth = rect.width * (canvas.width / containerRect.width);
-                const relativeHeight = rect.height * (canvas.height / containerRect.height);
-                
-                // Draw webcam feed in the exact same position and size
-                ctx.drawImage(webcam, relativeX, relativeY, relativeWidth, relativeHeight);
-            }
-            
-            requestAnimationFrame(drawComposite);
-        }
-
-        function resetTimer() {
-            seconds = 0;
-            minutes = 0;
-            hours = 0;
-            timer.textContent = '00:00:00';
-        }
-
-        function updateTimer() {
-            seconds++;
-            if (seconds >= 60) { seconds = 0; minutes++; if (minutes >= 60) { minutes = 0; hours++; } }
-            timer.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        }
-
+        // Start recording
         function startRecording() {
-            // If already recording, stop current recording first
-            if (isRecording) {
-                stopRecording();
-            }
-            
-            // Reset timer and recording data
-            resetTimer();
             recordedChunks = [];
-            
             const canvasStream = canvas.captureStream(30);
             const audioTrack = stream.getAudioTracks()[0];
             if (audioTrack) canvasStream.addTrack(audioTrack);
@@ -441,93 +344,85 @@
             const mimeType = getSupportedMimeType();
             const isMp4 = mimeType.includes('mp4');
             
-            mediaRecorder = new MediaRecorder(canvasStream, {
-                mimeType: mimeType,
-                videoBitsPerSecond: 5000000 // 5 Mbps = HD clarity
-            });
-
+            mediaRecorder = new MediaRecorder(canvasStream, { mimeType: mimeType });
             mediaRecorder.ondataavailable = e => { 
                 if (e.data.size > 0) recordedChunks.push(e.data); 
             };
-            
             mediaRecorder.onstop = () => {
                 const blobType = isMp4 ? 'video/mp4' : 'video/webm';
                 recordingBlob = new Blob(recordedChunks, { type: blobType });
                 downloadBtn.disabled = false;
                 shareBtn.disabled = false;
                 status.textContent = `Recording complete (${isMp4 ? 'MP4' : 'WebM'}). You can download or share.`;
-                isRecording = false;
             };
-            
             mediaRecorder.start();
-            startBtn.disabled = true; 
-            stopBtn.disabled = false;
+            isRecording = true;
+            startBtn.disabled = true; stopBtn.disabled = false; downloadBtn.disabled = true; shareBtn.disabled = true;
             recordingIndicator.style.display = 'inline-block';
             timerInterval = setInterval(updateTimer, 1000);
             status.textContent = 'Recording in progress...';
-            isRecording = true;
         }
 
+        // Stop recording
         function stopRecording() {
             if (mediaRecorder && mediaRecorder.state === 'recording') {
                 mediaRecorder.stop();
                 clearInterval(timerInterval);
                 recordingIndicator.style.display = 'none';
-                startBtn.disabled = false; 
-                stopBtn.disabled = true;
+                startBtn.disabled = false; stopBtn.disabled = true;
                 status.textContent = 'Recording stopped.';
-                isRecording = false;
             }
         }
 
+        // Download video
         function downloadRecording() {
             if (recordingBlob) {
                 const isMp4 = recordingBlob.type.includes('mp4');
                 const extension = isMp4 ? 'mp4' : 'webm';
                 const url = URL.createObjectURL(recordingBlob);
                 const a = document.createElement('a');
-                a.href = url;
-                a.download = `Run_For_Girl_Child_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.${extension}`;
-
-                a.click();
+                a.href = url; 
+                a.download = `recording.${extension}`;
+                a.click(); 
                 URL.revokeObjectURL(url);
                 showNotification();
             }
         }
 
+        // Share video using Web Share API
         async function shareRecording() {
             if (!recordingBlob) return alert('No recording available to share!');
-            
+
             const isMp4 = recordingBlob.type.includes('mp4');
             const extension = isMp4 ? 'mp4' : 'webm';
-            const file = new File([recordingBlob], `Run_For_Girl_Child.${extension}`, { 
-                type: recordingBlob.type 
-            });
+            const file = new File([recordingBlob], `recording.${extension}`, { type: recordingBlob.type });
             
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 try {
                     await navigator.share({
                         title: 'Run For Girl Child Recording',
-                        text: 'Check out my recording!',
+                        text: 'Check out my recording for Run For Girl Child!',
                         files: [file]
                     });
                     status.textContent = 'Recording shared successfully!';
                 } catch (err) {
-                    console.log('Share cancelled or failed:', err);
+                    console.error('Share cancelled or failed:', err);
                     if (err.name !== 'AbortError') {
                         status.textContent = 'Sharing failed. Try downloading instead.';
                     }
                 }
             } else {
-                alert('Sharing not supported. Please download the video instead.');
+                alert('Sharing not supported on this browser/device. Please download the video instead.');
             }
         }
 
+        // Show success toast
         function showNotification() {
             downloadNotification.style.display = 'block';
             setTimeout(() => downloadNotification.style.display = 'none', 3000);
         }
 
+        // Event listeners
         startBtn.onclick = startRecording;
         stopBtn.onclick = stopRecording;
         downloadBtn.onclick = downloadRecording;
