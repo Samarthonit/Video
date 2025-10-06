@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Run For Girl Child</title>
+    <title>Webcam Recorder with Frame</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
         }
         
         body {
-            background-color: #1f1f1f;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             color: white;
             min-height: 100vh;
             display: flex;
@@ -199,6 +199,31 @@
             margin-bottom: 10px;
         }
         
+        .download-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
         @media (max-width: 600px) {
             h1 {
                 font-size: 1.8rem;
@@ -218,13 +243,19 @@
                 top: 22%;
                 height: 38%;
             }
+            
+            .download-notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+            }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>Run For Girl Child</h1>
+        <h1>Webcam Recorder with Frame</h1>
         
         <div class="recorder-container">
             <img id="frame" src="frame.png" alt="Frame" onerror="handleImageError()">
@@ -251,7 +282,23 @@
             </button>
         </div>
         
+        <div id="status" class="status">
+            Click "Start" to begin recording
+        </div>
+        
+        <div class="instructions">
+            <h2>How to Use</h2>
+            <ol>
+                <li>Allow camera access when prompted</li>
+                <li>Click "Start" to begin recording with the frame overlay</li>
+                <li>Click "Stop" when finished recording</li>
+                <li>Download your recording</li>
+            </ol>
+        </div>
+    </div>
 
+    <div id="downloadNotification" class="download-notification">
+        <i class="fas fa-check-circle"></i> File downloaded successfully!
     </div>
 
     <script>
@@ -265,6 +312,7 @@
         const timer = document.getElementById('timer');
         const recordingIndicator = document.getElementById('recordingIndicator');
         const status = document.getElementById('status');
+        const downloadNotification = document.getElementById('downloadNotification');
         
         // Variables
         let mediaRecorder;
@@ -275,12 +323,21 @@
         let stream = null;
         let canvasContext;
         let frameLoaded = false;
+        let isRecording = false;
         
         // Handle image loading error
         function handleImageError() {
             status.textContent = 'Error: frame.png not found. Using placeholder frame.';
             // Create a placeholder frame based on your description
             frame.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480"><rect width="100%" height="100%" fill="%230052a7"/><text x="50%" y="15%" font-family="Arial" font-size="18" fill="white" text-anchor="middle">Event By</text><text x="50%" y="25%" font-family="Arial" font-size="28" fill="white" text-anchor="middle" font-weight="bold">RUNFOR</text><text x="50%" y="35%" font-family="Arial" font-size="24" fill="white" text-anchor="middle">GIRL</text><text x="50%" y="45%" font-family="Arial" font-size="24" fill="white" text-anchor="middle">CHILD</text><text x="50%" y="55%" font-family="Arial" font-size="14" fill="white" text-anchor="middle">SUBAT - 21K110K15K12K</text><text x="50%" y="65%" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Scan For Register</text><text x="20%" y="75%" font-family="Arial" font-size="16" fill="white" text-anchor="middle">2</text><text x="20%" y="82%" font-family="Arial" font-size="12" fill="white" text-anchor="middle">EDITION</text><text x="80%" y="75%" font-family="Arial" font-size="16" fill="white" text-anchor="middle">4th</text><text x="80%" y="82%" font-family="Arial" font-size="12" fill="white" text-anchor="middle">January, 2025</text><text x="50%" y="92%" font-family="Arial" font-size="12" fill="white" text-anchor="middle">www.runforgirlchild.org</text><rect x="128" y="192" width="384" height="144" fill="black" stroke="white" stroke-width="2"/><text x="50%" y="50%" font-family="Arial" font-size="18" fill="white" text-anchor="middle">Webcam Area</text></svg>';
+        }
+        
+        // Show download notification
+        function showDownloadNotification() {
+            downloadNotification.style.display = 'block';
+            setTimeout(() => {
+                downloadNotification.style.display = 'none';
+            }, 3000);
         }
         
         // Initialize webcam
@@ -314,6 +371,7 @@
                     };
                 }
                 
+                status.textContent = 'Webcam is ready. Click "Start" to begin recording.';
             } catch (error) {
                 console.error('Error accessing webcam:', error);
                 status.textContent = 'Error accessing webcam. Please make sure you have granted camera permissions.';
@@ -382,6 +440,7 @@
             }
             
             recordedChunks = [];
+            isRecording = true;
             
             // Create a new stream from the canvas
             const canvasStream = canvas.captureStream(30); // 30 FPS
@@ -394,10 +453,8 @@
             
             // Get supported MIME type
             const mimeType = getSupportedMimeType();
-            const isMp4 = mimeType.includes('mp4');
-            const fileExtension = isMp4 ? 'mp4' : 'webm';
             
-            // Set up media recorder with better settings for WhatsApp
+            // Set up media recorder with better settings
             const options = {
                 mimeType: mimeType,
                 videoBitsPerSecond: 2500000, // 2.5 Mbps for good quality
@@ -413,24 +470,29 @@
             }
             
             mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0) {
+                if (event.data.size > 0 && isRecording) {
                     recordedChunks.push(event.data);
                 }
             };
             
             mediaRecorder.onstop = async () => {
-                recordingBlob = new Blob(recordedChunks, { 
-                    type: mediaRecorder.mimeType || 'video/mp4'
-                });
+                isRecording = false;
                 
-                // Enable download button
-                downloadBtn.disabled = false;
-                
-                status.textContent = `Recording completed (${fileExtension.toUpperCase()} format). You can now download it.`;
+                // Ensure all chunks are collected and create blob
+                if (recordedChunks.length > 0) {
+                    recordingBlob = new Blob(recordedChunks, { 
+                        type: mediaRecorder.mimeType || 'video/webm'
+                    });
+                    
+                    // Enable download button
+                    downloadBtn.disabled = false;
+                    
+                    status.textContent = 'Recording completed. You can now download it.';
+                }
             };
             
-            // Start recording
-            mediaRecorder.start(1000); // Collect data every second for better performance
+            // Start recording with timeslice to ensure proper metadata
+            mediaRecorder.start(100); // Collect data every 100ms for better metadata
             startBtn.disabled = true;
             stopBtn.disabled = false;
             downloadBtn.disabled = true;
@@ -443,13 +505,16 @@
             updateTimer();
             timerInterval = setInterval(updateTimer, 1000);
             
-            status.textContent = `Recording in progress... (${fileExtension.toUpperCase()} format)`;
+            status.textContent = 'Recording in progress...';
         }
         
         // Stop recording
         function stopRecording() {
             if (mediaRecorder && mediaRecorder.state === 'recording') {
+                // Request final data chunk
+                mediaRecorder.requestData();
                 mediaRecorder.stop();
+                
                 startBtn.disabled = false;
                 stopBtn.disabled = true;
                 recordingIndicator.style.display = 'none';
@@ -457,7 +522,7 @@
                 // Stop timer
                 clearInterval(timerInterval);
                 
-                status.textContent = 'Processing recording...';
+                status.textContent = 'Finalizing recording...';
             }
         }
         
@@ -490,10 +555,21 @@
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = `recording-${new Date().toISOString().slice(0, 19)}.${extension}`;
+                
+                // Add click event to show notification after download
+                a.addEventListener('click', () => {
+                    setTimeout(() => {
+                        showDownloadNotification();
+                        // Clean up URL after download
+                        setTimeout(() => {
+                            URL.revokeObjectURL(url);
+                        }, 1000);
+                    }, 100);
+                });
+                
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                URL.revokeObjectURL(url);
             }
         }
         
