@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webcam Recorder with Frame</title>
+    <title>Run For Girl Child</title>
     <style>
+        /* ----- Existing CSS (unchanged) ----- */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
         }
-        
+
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-color: #1f1f1f;
             color: white;
             min-height: 100vh;
             display: flex;
@@ -21,19 +23,19 @@
             align-items: center;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 800px;
             width: 100%;
             text-align: center;
         }
-        
+
         h1 {
             margin: 20px 0;
             font-size: 2.5rem;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
-        
+
         .recorder-container {
             position: relative;
             width: 100%;
@@ -44,13 +46,13 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             background-color: #000;
         }
-        
+
         #frame {
             width: 100%;
             height: auto;
             display: block;
         }
-        
+
         #webcam {
             position: absolute;
             top: 0;
@@ -59,11 +61,11 @@
             height: 100%;
             object-fit: cover;
         }
-        
+
         #canvas {
             display: none;
         }
-        
+
         .webcam-area {
             position: absolute;
             top: 25%;
@@ -74,7 +76,7 @@
             overflow: hidden;
             box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
         }
-        
+
         .controls {
             display: flex;
             justify-content: center;
@@ -82,7 +84,7 @@
             margin: 25px 0;
             flex-wrap: wrap;
         }
-        
+
         .btn {
             padding: 12px 25px;
             border: none;
@@ -90,7 +92,7 @@
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all .3s ease;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             display: flex;
             align-items: center;
@@ -98,42 +100,48 @@
             gap: 8px;
             min-width: 140px;
         }
-        
+
         .btn i {
             font-size: 1.2rem;
         }
-        
+
         .btn-start {
             background-color: #4CAF50;
             color: white;
         }
-        
+
         .btn-stop {
             background-color: #f44336;
             color: white;
         }
-        
+
         .btn-download {
             background-color: #2196F3;
             color: white;
         }
-        
+
+        .btn-share {
+            background-color: #9C27B0;
+            color: white;
+        }
+
+        /* 🎯 New Share button color */
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
-        
+
         .btn:active {
             transform: translateY(1px);
         }
-        
+
         .btn:disabled {
-            background-color: #cccccc;
+            background-color: #ccc;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
-        
+
         .timer-container {
             margin: 20px 0;
             font-size: 1.5rem;
@@ -143,7 +151,7 @@
             justify-content: center;
             gap: 10px;
         }
-        
+
         .recording-indicator {
             display: inline-block;
             width: 15px;
@@ -152,22 +160,24 @@
             border-radius: 50%;
             animation: pulse 1.5s infinite;
         }
-        
+
         @keyframes pulse {
             0% {
                 transform: scale(0.9);
                 opacity: 0.7;
             }
+
             50% {
                 transform: scale(1.2);
                 opacity: 1;
             }
+
             100% {
                 transform: scale(0.9);
                 opacity: 0.7;
             }
         }
-        
+
         .status {
             margin: 15px 0;
             padding: 10px;
@@ -175,30 +185,7 @@
             background-color: rgba(255, 255, 255, 0.1);
             font-size: 1rem;
         }
-        
-        .instructions {
-            margin-top: 30px;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: left;
-            max-width: 600px;
-        }
-        
-        .instructions h2 {
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        
-        .instructions ol {
-            margin-left: 20px;
-            line-height: 1.6;
-        }
-        
-        .instructions li {
-            margin-bottom: 10px;
-        }
-        
+
         .download-notification {
             position: fixed;
             top: 20px;
@@ -207,94 +194,69 @@
             color: white;
             padding: 15px 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             z-index: 1000;
             display: none;
-            animation: slideIn 0.3s ease;
+            animation: slideIn .3s ease;
         }
-        
+
         @keyframes slideIn {
             from {
                 transform: translateX(100%);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
             }
         }
-        
-        @media (max-width: 600px) {
+
+        @media(max-width:600px) {
             h1 {
                 font-size: 1.8rem;
             }
-            
+
             .btn {
                 padding: 10px 20px;
-                font-size: 0.9rem;
+                font-size: .9rem;
                 min-width: 120px;
             }
-            
+
             .timer-container {
                 font-size: 1.2rem;
-            }
-            
-            .webcam-area {
-                top: 22%;
-                height: 38%;
-            }
-            
-            .download-notification {
-                top: 10px;
-                right: 10px;
-                left: 10px;
             }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <div class="container">
-        <h1>Webcam Recorder with Frame</h1>
-        
+        <h1>Run For Girl Child</h1>
+
         <div class="recorder-container">
-            <img id="frame" src="frame.png" alt="Frame" onerror="handleImageError()">
+            <img id="frame" src="frame.png" alt="Frame">
             <div class="webcam-area">
                 <video id="webcam" autoplay muted playsinline></video>
             </div>
             <canvas id="canvas"></canvas>
         </div>
-        
+
         <div class="timer-container">
             <span id="timer">00:00:00</span>
-            <div id="recordingIndicator" class="recording-indicator" style="display: none;"></div>
+            <div id="recordingIndicator" class="recording-indicator" style="display:none;"></div>
         </div>
-        
+
         <div class="controls">
-            <button id="startBtn" class="btn btn-start">
-                <i class="fas fa-record-vinyl"></i> Start
-            </button>
-            <button id="stopBtn" class="btn btn-stop" disabled>
-                <i class="fas fa-stop"></i> Stop
-            </button>
-            <button id="downloadBtn" class="btn btn-download" disabled>
-                <i class="fas fa-download"></i> Download
-            </button>
+            <button id="startBtn" class="btn btn-start"><i class="fas fa-record-vinyl"></i>Start</button>
+            <button id="stopBtn" class="btn btn-stop" disabled><i class="fas fa-stop"></i>Stop</button>
+            <button id="downloadBtn" class="btn btn-download" disabled><i class="fas fa-download"></i>Download</button>
+            <button id="shareBtn" class="btn btn-share" disabled><i class="fas fa-share-alt"></i>Share</button>
+            <!-- ✅ New button -->
         </div>
-        
-        <div id="status" class="status">
-            Click "Start" to begin recording
-        </div>
-        
-        <div class="instructions">
-            <h2>How to Use</h2>
-            <ol>
-                <li>Allow camera access when prompted</li>
-                <li>Click "Start" to begin recording with the frame overlay</li>
-                <li>Click "Stop" when finished recording</li>
-                <li>Download your recording</li>
-            </ol>
-        </div>
+
+        <div id="status" class="status">Click "Start" to begin recording</div>
     </div>
 
     <div id="downloadNotification" class="download-notification">
@@ -302,287 +264,143 @@
     </div>
 
     <script>
-        // DOM elements
         const webcam = document.getElementById('webcam');
         const frame = document.getElementById('frame');
         const canvas = document.getElementById('canvas');
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
         const downloadBtn = document.getElementById('downloadBtn');
+        const shareBtn = document.getElementById('shareBtn');
         const timer = document.getElementById('timer');
         const recordingIndicator = document.getElementById('recordingIndicator');
         const status = document.getElementById('status');
         const downloadNotification = document.getElementById('downloadNotification');
-        
-        // Variables
-        let mediaRecorder;
-        let recordedChunks = [];
-        let timerInterval;
-        let seconds = 0, minutes = 0, hours = 0;
-        let recordingBlob = null;
-        let stream = null;
-        let canvasContext;
-        let frameLoaded = false;
-        let isRecording = false;
-        
-        // Handle image loading error
-        function handleImageError() {
-            status.textContent = 'Error: frame.png not found. Using placeholder frame.';
-            // Create a placeholder frame based on your description
-            frame.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480"><rect width="100%" height="100%" fill="%230052a7"/><text x="50%" y="15%" font-family="Arial" font-size="18" fill="white" text-anchor="middle">Event By</text><text x="50%" y="25%" font-family="Arial" font-size="28" fill="white" text-anchor="middle" font-weight="bold">RUNFOR</text><text x="50%" y="35%" font-family="Arial" font-size="24" fill="white" text-anchor="middle">GIRL</text><text x="50%" y="45%" font-family="Arial" font-size="24" fill="white" text-anchor="middle">CHILD</text><text x="50%" y="55%" font-family="Arial" font-size="14" fill="white" text-anchor="middle">SUBAT - 21K110K15K12K</text><text x="50%" y="65%" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Scan For Register</text><text x="20%" y="75%" font-family="Arial" font-size="16" fill="white" text-anchor="middle">2</text><text x="20%" y="82%" font-family="Arial" font-size="12" fill="white" text-anchor="middle">EDITION</text><text x="80%" y="75%" font-family="Arial" font-size="16" fill="white" text-anchor="middle">4th</text><text x="80%" y="82%" font-family="Arial" font-size="12" fill="white" text-anchor="middle">January, 2025</text><text x="50%" y="92%" font-family="Arial" font-size="12" fill="white" text-anchor="middle">www.runforgirlchild.org</text><rect x="128" y="192" width="384" height="144" fill="black" stroke="white" stroke-width="2"/><text x="50%" y="50%" font-family="Arial" font-size="18" fill="white" text-anchor="middle">Webcam Area</text></svg>';
-        }
-        
-        // Show download notification
-        function showDownloadNotification() {
-            downloadNotification.style.display = 'block';
-            setTimeout(() => {
-                downloadNotification.style.display = 'none';
-            }, 3000);
-        }
-        
+
+        let mediaRecorder, recordedChunks = [], stream = null, recordingBlob = null, timerInterval;
+        let seconds = 0, minutes = 0, hours = 0, isRecording = false;
+
         // Initialize webcam
         async function initWebcam() {
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        width: { ideal: 640 },
-                        height: { ideal: 480 },
-                        frameRate: { ideal: 30 }
-                    }, 
-                    audio: {
-                        echoCancellation: true,
-                        noiseSuppression: true,
-                        sampleRate: 44100
-                    }
-                });
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 webcam.srcObject = stream;
-                
-                // Set up canvas context
-                canvasContext = canvas.getContext('2d');
-                
-                // Wait for frame to load
-                if (frame.complete && frame.naturalHeight !== 0) {
-                    frameLoaded = true;
-                    setupCanvas();
-                } else {
-                    frame.onload = () => {
-                        frameLoaded = true;
-                        setupCanvas();
-                    };
-                }
-                
-                status.textContent = 'Webcam is ready. Click "Start" to begin recording.';
-            } catch (error) {
-                console.error('Error accessing webcam:', error);
-                status.textContent = 'Error accessing webcam. Please make sure you have granted camera permissions.';
+                canvas.getContext('2d');
+                requestAnimationFrame(drawComposite);
+                status.textContent = 'Webcam ready. Click "Start" to record.';
+            } catch (err) {
+                status.textContent = 'Error accessing webcam: ' + err.message;
             }
         }
-        
-        // Set up canvas for recording
-        function setupCanvas() {
-            // Set canvas size to match frame
+
+        // Draw webcam + frame
+        function drawComposite() {
+            const ctx = canvas.getContext('2d');
             canvas.width = frame.width || 640;
             canvas.height = frame.height || 480;
-            
-            // Start drawing the composite image
-            drawComposite();
-        }
-        
-        // Draw composite of frame and webcam
-        function drawComposite() {
-            if (!frameLoaded || !webcam.videoWidth) {
-                requestAnimationFrame(drawComposite);
-                return;
-            }
-            
-            // Clear canvas
-            canvasContext.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw frame
-            canvasContext.drawImage(frame, 0, 0, canvas.width, canvas.height);
-            
-            // Calculate webcam position to fit inside frame (smaller area)
-            const webcamX = canvas.width * 0.2;
-            const webcamY = canvas.height * 0.25;
-            const webcamWidth = canvas.width * 0.6;
-            const webcamHeight = canvas.height * 0.35;
-            
-            // Draw webcam video inside frame
-            canvasContext.drawImage(webcam, webcamX, webcamY, webcamWidth, webcamHeight);
-            
-            // Continue animation
+            ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
+            const wx = canvas.width * 0.2, wy = canvas.height * 0.25, ww = canvas.width * 0.6, wh = canvas.height * 0.35;
+            if (webcam.readyState >= 2) ctx.drawImage(webcam, wx, wy, ww, wh);
             requestAnimationFrame(drawComposite);
         }
-        
-        // Get supported MIME type for better compatibility
-        function getSupportedMimeType() {
-            const types = [
-                'video/mp4; codecs="avc1.42E01E, mp4a.40.2"', // MP4 with H.264 and AAC
-                'video/webm; codecs="vp9, opus"',
-                'video/webm; codecs="vp8, opus"',
-                'video/webm'
-            ];
-            
-            for (let type of types) {
-                if (MediaRecorder.isTypeSupported(type)) {
-                    console.log('Using MIME type:', type);
-                    return type;
-                }
-            }
-            return 'video/webm'; // Fallback
-        }
-        
-        // Start recording
-        async function startRecording() {
-            if (!stream || !frameLoaded) {
-                status.textContent = 'Webcam or frame not ready yet. Please wait.';
-                return;
-            }
-            
-            recordedChunks = [];
-            isRecording = true;
-            
-            // Create a new stream from the canvas
-            const canvasStream = canvas.captureStream(30); // 30 FPS
-            
-            // Add audio track if available
-            const audioTracks = stream.getAudioTracks();
-            if (audioTracks.length > 0) {
-                canvasStream.addTrack(audioTracks[0]);
-            }
-            
-            // Get supported MIME type
-            const mimeType = getSupportedMimeType();
-            
-            // Set up media recorder with better settings
-            const options = {
-                mimeType: mimeType,
-                videoBitsPerSecond: 2500000, // 2.5 Mbps for good quality
-                audioBitsPerSecond: 128000   // 128 kbps for audio
-            };
-            
-            try {
-                mediaRecorder = new MediaRecorder(canvasStream, options);
-            } catch (e) {
-                console.error('Error creating media recorder:', e);
-                // Fallback to basic options
-                mediaRecorder = new MediaRecorder(canvasStream);
-            }
-            
-            mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0 && isRecording) {
-                    recordedChunks.push(event.data);
-                }
-            };
-            
-            mediaRecorder.onstop = async () => {
-                isRecording = false;
-                
-                // Ensure all chunks are collected and create blob
-                if (recordedChunks.length > 0) {
-                    recordingBlob = new Blob(recordedChunks, { 
-                        type: mediaRecorder.mimeType || 'video/webm'
-                    });
-                    
-                    // Enable download button
-                    downloadBtn.disabled = false;
-                    
-                    status.textContent = 'Recording completed. You can now download it.';
-                }
-            };
-            
-            // Start recording with timeslice to ensure proper metadata
-            mediaRecorder.start(100); // Collect data every 100ms for better metadata
-            startBtn.disabled = true;
-            stopBtn.disabled = false;
-            downloadBtn.disabled = true;
-            recordingIndicator.style.display = 'inline-block';
-            
-            // Start timer
-            seconds = 0;
-            minutes = 0;
-            hours = 0;
-            updateTimer();
-            timerInterval = setInterval(updateTimer, 1000);
-            
-            status.textContent = 'Recording in progress...';
-        }
-        
-        // Stop recording
-        function stopRecording() {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                // Request final data chunk
-                mediaRecorder.requestData();
-                mediaRecorder.stop();
-                
-                startBtn.disabled = false;
-                stopBtn.disabled = true;
-                recordingIndicator.style.display = 'none';
-                
-                // Stop timer
-                clearInterval(timerInterval);
-                
-                status.textContent = 'Finalizing recording...';
-            }
-        }
-        
-        // Update timer display
+
+        // Timer
         function updateTimer() {
             seconds++;
-            if (seconds >= 60) {
-                seconds = 0;
-                minutes++;
-                if (minutes >= 60) {
-                    minutes = 0;
-                    hours++;
-                }
-            }
-            
-            const formattedTime = 
-                (hours < 10 ? '0' + hours : hours) + ':' +
-                (minutes < 10 ? '0' + minutes : minutes) + ':' +
-                (seconds < 10 ? '0' + seconds : seconds);
-            
-            timer.textContent = formattedTime;
+            if (seconds >= 60) { seconds = 0; minutes++; if (minutes >= 60) { minutes = 0; hours++; } }
+            timer.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
-        
-        // Download recording
+
+        // Start recording
+        function startRecording() {
+            recordedChunks = [];
+            const canvasStream = canvas.captureStream(30);
+            const audioTrack = stream.getAudioTracks()[0];
+            if (audioTrack) canvasStream.addTrack(audioTrack);
+            mediaRecorder = new MediaRecorder(canvasStream);
+            mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+            mediaRecorder.onstop = () => {
+                recordingBlob = new Blob(recordedChunks, { type: 'video/webm' });
+                downloadBtn.disabled = false;
+                shareBtn.disabled = false;
+                status.textContent = 'Recording complete. You can download or share.';
+            };
+            mediaRecorder.start();
+            isRecording = true;
+            startBtn.disabled = true; stopBtn.disabled = false; downloadBtn.disabled = true; shareBtn.disabled = true;
+            recordingIndicator.style.display = 'inline-block';
+            timerInterval = setInterval(updateTimer, 1000);
+            status.textContent = 'Recording in progress...';
+        }
+
+        // Stop recording
+        // Stop recording (fixed version)
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                status.textContent = 'Finalizing recording... please wait a moment.';
+
+                // 🧩 Flush last video data before stopping
+                mediaRecorder.requestData();
+
+                // 🕐 Wait a bit so metadata finishes writing
+                setTimeout(() => {
+                    mediaRecorder.stop();
+                    clearInterval(timerInterval);
+                    recordingIndicator.style.display = 'none';
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    status.textContent = 'Recording stopped. Processing complete.';
+                }, 800); // You can change to 500–1000 ms
+            }
+        }
+
+
+        // Download video
         function downloadRecording() {
             if (recordingBlob) {
-                const mimeType = recordingBlob.type;
-                const extension = mimeType.includes('mp4') ? 'mp4' : 'webm';
                 const url = URL.createObjectURL(recordingBlob);
                 const a = document.createElement('a');
-                a.href = url;
-                a.download = `recording-${new Date().toISOString().slice(0, 19)}.${extension}`;
-                
-                // Add click event to show notification after download
-                a.addEventListener('click', () => {
-                    setTimeout(() => {
-                        showDownloadNotification();
-                        // Clean up URL after download
-                        setTimeout(() => {
-                            URL.revokeObjectURL(url);
-                        }, 1000);
-                    }, 100);
-                });
-                
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+                a.href = url; a.download = 'recording.webm';
+                a.click(); URL.revokeObjectURL(url);
+                showNotification();
             }
         }
-        
+
+        // ✅ Share video using Web Share API
+        async function shareRecording() {
+            if (!recordingBlob) return alert('No recording available to share!');
+
+            const file = new File([recordingBlob], 'recording.webm', { type: 'video/webm' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        title: 'My Webcam Recording',
+                        text: 'Check out this video I recorded!',
+                        files: [file]
+                    });
+                    status.textContent = 'Recording shared successfully!';
+                } catch (err) {
+                    console.error('Share cancelled or failed:', err);
+                }
+            } else {
+                alert('Sharing not supported on this browser/device.');
+            }
+        }
+
+        // Show success toast
+        function showNotification() {
+            downloadNotification.style.display = 'block';
+            setTimeout(() => downloadNotification.style.display = 'none', 3000);
+        }
+
         // Event listeners
-        startBtn.addEventListener('click', startRecording);
-        stopBtn.addEventListener('click', stopRecording);
-        downloadBtn.addEventListener('click', downloadRecording);
-        
-        // Initialize the app
-        window.addEventListener('load', initWebcam);
+        startBtn.onclick = startRecording;
+        stopBtn.onclick = stopRecording;
+        downloadBtn.onclick = downloadRecording;
+        shareBtn.onclick = shareRecording;
+        window.onload = initWebcam;
     </script>
 </body>
-</html>
 
+</html>
 
 
