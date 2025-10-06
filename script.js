@@ -91,8 +91,6 @@ async function initCamera() {
 
     camera.onloadedmetadata = () => {
       const aspectRatio = camera.videoWidth / camera.videoHeight;
-
-      // Make the video responsive but preserve the actual camera aspect ratio
       camera.style.width = "100%";
       camera.style.height = `${camera.offsetWidth / aspectRatio}px`;
     };
@@ -103,5 +101,6 @@ async function initCamera() {
 
 
 initCamera();
+
 
 
