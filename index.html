@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webcam Recorder with Frame</title>
+    <title>Run For Girl Child</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-color: #1f1f1f;
             color: white;
             min-height: 100vh;
             display: flex;
@@ -66,10 +66,10 @@
         
         .webcam-area {
             position: absolute;
-            top: 20%;
-            left: 10%;
-            width: 80%;
-            height: 60%;
+            top: 25%;
+            left: 20%;
+            width: 60%;
+            height: 35%;
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
@@ -115,11 +115,6 @@
         
         .btn-download {
             background-color: #2196F3;
-            color: white;
-        }
-        
-        .btn-share {
-            background-color: #FF9800;
             color: white;
         }
         
@@ -204,13 +199,6 @@
             margin-bottom: 10px;
         }
         
-        .format-info {
-            background-color: rgba(255, 255, 255, 0.15);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-        
         @media (max-width: 600px) {
             h1 {
                 font-size: 1.8rem;
@@ -227,8 +215,8 @@
             }
             
             .webcam-area {
-                top: 15%;
-                height: 70%;
+                top: 22%;
+                height: 38%;
             }
         }
     </style>
@@ -236,7 +224,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Webcam Recorder with Frame</h1>
+        <h1>Run For Girl Child</h1>
         
         <div class="recorder-container">
             <img id="frame" src="frame.png" alt="Frame" onerror="handleImageError()">
@@ -261,27 +249,9 @@
             <button id="downloadBtn" class="btn btn-download" disabled>
                 <i class="fas fa-download"></i> Download
             </button>
-            <button id="shareBtn" class="btn btn-share" disabled>
-                <i class="fas fa-share-alt"></i> Share
-            </button>
         </div>
         
-        <div id="status" class="status">
-            Click "Start" to begin recording
-        </div>
-        
-        <div class="instructions">
-            <h2>How to Use</h2>
-            <ol>
-                <li>Allow camera access when prompted</li>
-                <li>Click "Start" to begin recording with the frame overlay</li>
-                <li>Click "Stop" when finished recording</li>
-                <li>Download your recording or share it directly</li>
-            </ol>
-            <div class="format-info">
-                <p><strong>WhatsApp Compatibility:</strong> Videos are now saved in MP4 format with H.264 codec for better compatibility with WhatsApp and other apps.</p>
-            </div>
-        </div>
+
     </div>
 
     <script>
@@ -292,7 +262,6 @@
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
         const downloadBtn = document.getElementById('downloadBtn');
-        const shareBtn = document.getElementById('shareBtn');
         const timer = document.getElementById('timer');
         const recordingIndicator = document.getElementById('recordingIndicator');
         const status = document.getElementById('status');
@@ -309,9 +278,9 @@
         
         // Handle image loading error
         function handleImageError() {
-            status.textContent = 'Error: frame.png not found. Please make sure it is in the same folder.';
-            // Create a placeholder frame
-            frame.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480"><rect width="100%" height="100%" fill="%23333"/><text x="50%" y="50%" font-family="Arial" font-size="24" fill="white" text-anchor="middle">frame.png</text><rect x="64" y="96" width="512" height="288" fill="black" stroke="white" stroke-width="2"/><text x="50%" y="60%" font-family="Arial" font-size="18" fill="white" text-anchor="middle">Webcam will appear here</text></svg>';
+            status.textContent = 'Error: frame.png not found. Using placeholder frame.';
+            // Create a placeholder frame based on your description
+            frame.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480"><rect width="100%" height="100%" fill="%230052a7"/><text x="50%" y="15%" font-family="Arial" font-size="18" fill="white" text-anchor="middle">Event By</text><text x="50%" y="25%" font-family="Arial" font-size="28" fill="white" text-anchor="middle" font-weight="bold">RUNFOR</text><text x="50%" y="35%" font-family="Arial" font-size="24" fill="white" text-anchor="middle">GIRL</text><text x="50%" y="45%" font-family="Arial" font-size="24" fill="white" text-anchor="middle">CHILD</text><text x="50%" y="55%" font-family="Arial" font-size="14" fill="white" text-anchor="middle">SUBAT - 21K110K15K12K</text><text x="50%" y="65%" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Scan For Register</text><text x="20%" y="75%" font-family="Arial" font-size="16" fill="white" text-anchor="middle">2</text><text x="20%" y="82%" font-family="Arial" font-size="12" fill="white" text-anchor="middle">EDITION</text><text x="80%" y="75%" font-family="Arial" font-size="16" fill="white" text-anchor="middle">4th</text><text x="80%" y="82%" font-family="Arial" font-size="12" fill="white" text-anchor="middle">January, 2025</text><text x="50%" y="92%" font-family="Arial" font-size="12" fill="white" text-anchor="middle">www.runforgirlchild.org</text><rect x="128" y="192" width="384" height="144" fill="black" stroke="white" stroke-width="2"/><text x="50%" y="50%" font-family="Arial" font-size="18" fill="white" text-anchor="middle">Webcam Area</text></svg>';
         }
         
         // Initialize webcam
@@ -345,7 +314,6 @@
                     };
                 }
                 
-                status.textContent = 'Webcam is ready. Click "Start" to begin recording.';
             } catch (error) {
                 console.error('Error accessing webcam:', error);
                 status.textContent = 'Error accessing webcam. Please make sure you have granted camera permissions.';
@@ -375,11 +343,11 @@
             // Draw frame
             canvasContext.drawImage(frame, 0, 0, canvas.width, canvas.height);
             
-            // Calculate webcam position to fit inside frame
-            const webcamX = canvas.width * 0.1;
-            const webcamY = canvas.height * 0.2;
-            const webcamWidth = canvas.width * 0.8;
-            const webcamHeight = canvas.height * 0.6;
+            // Calculate webcam position to fit inside frame (smaller area)
+            const webcamX = canvas.width * 0.2;
+            const webcamY = canvas.height * 0.25;
+            const webcamWidth = canvas.width * 0.6;
+            const webcamHeight = canvas.height * 0.35;
             
             // Draw webcam video inside frame
             canvasContext.drawImage(webcam, webcamX, webcamY, webcamWidth, webcamHeight);
@@ -404,17 +372,6 @@
                 }
             }
             return 'video/webm'; // Fallback
-        }
-        
-        // Convert WebM to MP4 for better WhatsApp compatibility
-        async function convertForWhatsApp(webmBlob) {
-            status.textContent = 'Converting video for WhatsApp compatibility...';
-            
-            // For now, we'll use MP4 format directly in recording
-            // In a production app, you might want to use a library like ffmpeg.js
-            // for proper format conversion
-            
-            return webmBlob;
         }
         
         // Start recording
@@ -466,18 +423,10 @@
                     type: mediaRecorder.mimeType || 'video/mp4'
                 });
                 
-                // If it's WebM, try to handle conversion
-                if (!mediaRecorder.mimeType.includes('mp4')) {
-                    status.textContent = 'Converting format for better compatibility...';
-                    // Note: In a real app, you'd use ffmpeg.js or similar for conversion
-                    // For now, we'll proceed with the original format
-                }
-                
-                // Enable download and share buttons
+                // Enable download button
                 downloadBtn.disabled = false;
-                shareBtn.disabled = false;
                 
-                status.textContent = `Recording completed (${fileExtension.toUpperCase()} format). You can now download or share it.`;
+                status.textContent = `Recording completed (${fileExtension.toUpperCase()} format). You can now download it.`;
             };
             
             // Start recording
@@ -485,7 +434,6 @@
             startBtn.disabled = true;
             stopBtn.disabled = false;
             downloadBtn.disabled = true;
-            shareBtn.disabled = true;
             recordingIndicator.style.display = 'inline-block';
             
             // Start timer
@@ -549,42 +497,10 @@
             }
         }
         
-        // Share recording
-        async function shareRecording() {
-            if (recordingBlob && navigator.share) {
-                try {
-                    const mimeType = recordingBlob.type;
-                    const extension = mimeType.includes('mp4') ? 'mp4' : 'webm';
-                    
-                    const file = new File([recordingBlob], `recording-${new Date().toISOString().slice(0, 19)}.${extension}`, { 
-                        type: mimeType
-                    });
-                    
-                    await navigator.share({
-                        files: [file],
-                        title: 'My Webcam Recording',
-                        text: 'Check out this recording I made with the webcam recorder!'
-                    });
-                    
-                    status.textContent = 'Recording shared successfully!';
-                } catch (error) {
-                    console.error('Error sharing:', error);
-                    if (error.name === 'AbortError') {
-                        status.textContent = 'Share was cancelled.';
-                    } else {
-                        status.textContent = 'Sharing failed. The video format might not be supported. Try downloading instead.';
-                    }
-                }
-            } else {
-                status.textContent = 'Web Share API not supported in your browser. Please download the recording and share manually.';
-            }
-        }
-        
         // Event listeners
         startBtn.addEventListener('click', startRecording);
         stopBtn.addEventListener('click', stopRecording);
         downloadBtn.addEventListener('click', downloadRecording);
-        shareBtn.addEventListener('click', shareRecording);
         
         // Initialize the app
         window.addEventListener('load', initWebcam);
