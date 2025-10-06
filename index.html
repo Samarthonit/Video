@@ -1,36 +1,344 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Video Recorder</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Frame + Webcam Recorder</title>
+  <style>
+    body {
+      margin: 18px;
+      font-family: system-ui, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      background: #f5f5f5;
+      color: #111;
+    }
 
+    .canvas-wrap {
+      width: 100%;
+      max-width: 420px;    /* page scaling for mobile */
+      display: flex;
+      justify-content: center;
+    }
+
+    /* canvas will use the frame's native resolution but scale down visually */
+    canvas {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+      background: #000;
+      image-rendering: auto;
+    }
+
+    .controls { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+    button {
+      background:#ff6600; color:white; border:0; padding:10px 16px; border-radius:20px;
+      cursor:pointer; font-weight:600;
+    }
+    button:disabled { opacity:0.5; cursor:not-allowed; }
+    .timer { color:#d00; font-weight:700; display:none; }
+    .msg { font-size:13px; color:#555; text-align:center; max-width:420px; }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Video Recorder</h2>
 
-    <div class="video-wrapper">
-      <video id="camera" autoplay playsinline muted></video>
-      <div class="recording-indicator" id="recordIndicator" style="display:none;">
-        <div class="dot"></div>
-        <span id="timer">00:00</span>
-      </div>
-    </div>
-
-    <div class="controls">
-      <button id="startBtn">Start Recording</button>
-      <button id="stopBtn">Stop Recording</button>
-      <button id="shareBtn">Share</button>
-    </div>
-
-    <div class="error" id="error"></div>
-
-    <h3>Preview</h3>
-    <video id="preview" controls></video>
+  <div class="msg">
+    Make sure your frame image file is in the same folder and named <code>frame.png</code> (or change the filename below).
+    The downloaded video will match the frame's original resolution (no stretching).
   </div>
 
-  <script src="script.js"></script>
+  <div class="canvas-wrap">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <div class="timer" id="timer">● REC 00:00</div>
+
+  <div class="controls">
+    <button id="startBtn">Start</button>
+    <button id="stopBtn" disabled>Stop</button>
+    <button id="downloadBtn" disabled>Download</button>
+    <button id="shareBtn" disabled>Share</button>
+  </div>
+
+  <div class="msg" id="status"></div>
+
+<script>
+(async function () {
+  // ---------- CONFIG ----------
+  const FRAME_FILENAME = 'frame.png'; // change if your image name is different
+  // percentages of the frame where the webcam should be drawn:
+  // (all relative to frame width/height)
+  const CAM_PCT = {
+    x: 0.15,     // left margin as percent of width
+    y: 0.18,     // top margin as percent of height
+    w: 0.7,      // webcam width as percent of frame width
+    h: 0.45      // webcam height as percent of frame height
+  };
+  // ---------- /CONFIG ----------
+
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const shareBtn = document.getElementById('shareBtn');
+  const timerEl = document.getElementById('timer');
+  const statusEl = document.getElementById('status');
+
+  let frameImg = new Image();
+  frameImg.src = FRAME_FILENAME;
+
+  let webcamStream = null;
+  const hiddenVideo = document.createElement('video'); // used just as source for drawing
+  hiddenVideo.playsInline = true;
+  hiddenVideo.muted = true;
+  hiddenVideo.autoplay = true;
+
+  let mediaRecorder = null;
+  let recordedChunks = [];
+
+  let recordingStart = 0;
+  let timerInterval = null;
+
+  function setStatus(msg) { statusEl.textContent = msg || ''; }
+
+  // helper: wait for image load
+  function waitImageLoad(img) {
+    return new Promise((resolve, reject) => {
+      if (img.complete && img.naturalWidth) return resolve();
+      img.onload = () => resolve();
+      img.onerror = (e) => reject(new Error('Frame image failed to load: ' + FRAME_FILENAME));
+    });
+  }
+
+  // get webcam
+  async function getWebcam() {
+    try {
+      const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
+      return s;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  // wait for both frame image and webcam
+  try {
+    setStatus('Requesting camera permission...');
+    const [ , ] = await Promise.all([
+      waitImageLoad(frameImg).catch(e => { throw e; }),
+      (async () => {
+        webcamStream = await getWebcam().catch(e => { throw e; });
+        // attach to hidden video to get metadata, dimensions
+        hiddenVideo.srcObject = webcamStream;
+        await hiddenVideo.play().catch(()=>{/* may fail autoplayer but ok since muted */});
+      })()
+    ]);
+  } catch (err) {
+    console.error(err);
+    setStatus('Error: ' + (err.message || err.name) + '. Check console for details. Camera permission or image load may have failed.');
+    return;
+  }
+
+  // set canvas to frame's natural resolution (this avoids any stretching in final video)
+  canvas.width = frameImg.naturalWidth || 720;
+  canvas.height = frameImg.naturalHeight || 1280;
+
+  // scale canvas visually via CSS (already set max-width),
+  // but the pixel resolution remains the frame's natural size.
+
+  // Drawing loop (always run so page shows live preview)
+  let rafId;
+  function drawLoop() {
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+
+    // draw the frame image at full size
+    ctx.drawImage(frameImg, 0, 0, w, h);
+
+    // compute webcam rectangle
+    const camW = Math.round(w * CAM_PCT.w);
+    const camH = Math.round(h * CAM_PCT.h);
+    const camX = Math.round(w * CAM_PCT.x);
+    const camY = Math.round(h * CAM_PCT.y);
+
+    // draw webcam into that rect but preserve webcam aspect ratio (cover behavior)
+    if (hiddenVideo.videoWidth > 0 && hiddenVideo.videoHeight > 0) {
+      drawVideoCover(hiddenVideo, camX, camY, camW, camH);
+    } else {
+      // video metadata not ready yet: draw a black box
+      ctx.fillStyle = '#000';
+      ctx.fillRect(camX, camY, camW, camH);
+    }
+
+    rafId = requestAnimationFrame(drawLoop);
+  }
+
+  function drawVideoCover(video, dx, dy, dw, dh) {
+    const vw = video.videoWidth;
+    const vh = video.videoHeight;
+    if (!vw || !vh) {
+      ctx.fillStyle = '#000';
+      ctx.fillRect(dx, dy, dw, dh);
+      return;
+    }
+    const videoRatio = vw / vh;
+    const rectRatio = dw / dh;
+
+    let sx = 0, sy = 0, sw = vw, sh = vh;
+
+    // cover -> crop so that video fills the rectangle, preserving aspect ratio
+    if (videoRatio > rectRatio) {
+      // video is wider -> crop left & right
+      sw = Math.round(vh * rectRatio);
+      sx = Math.round((vw - sw) / 2);
+    } else {
+      // video is taller -> crop top & bottom
+      sh = Math.round(vw / rectRatio);
+      sy = Math.round((vh - sh) / 2);
+    }
+
+    // optional: round values
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(dx, dy, dw, dh);
+    ctx.clip();
+    ctx.drawImage(video, sx, sy, sw, sh, dx, dy, dw, dh);
+    ctx.restore();
+  }
+
+  // start the visible preview
+  drawLoop();
+  setStatus('Camera ready — preview visible. Click Start to record.');
+
+  // recording helpers
+  function startTimer() {
+    recordingStart = Date.now();
+    timerEl.style.display = 'block';
+    updateTimer();
+    timerInterval = setInterval(updateTimer, 500);
+  }
+  function stopTimer() {
+    clearInterval(timerInterval); timerInterval = null;
+    timerEl.style.display = 'none';
+  }
+  function updateTimer() {
+    const s = Math.floor((Date.now() - recordingStart) / 1000);
+    const mm = String(Math.floor(s/60)).padStart(2,'0');
+    const ss = String(s % 60).padStart(2,'0');
+    timerEl.textContent = `● REC ${mm}:${ss}`;
+  }
+
+  function startRecording() {
+    recordedChunks = [];
+    // capture canvas at 30fps (or browser default)
+    const canvasStream = canvas.captureStream(30);
+
+    // if webcam has audio, attach the first audio track to the canvas stream for recording
+    const audioTracks = webcamStream.getAudioTracks();
+    if (audioTracks && audioTracks.length > 0) {
+      canvasStream.addTrack(audioTracks[0]);
+    }
+
+    // choose supported mimeType
+    let mime = 'video/webm;codecs=vp9,opus';
+    if (!MediaRecorder.isTypeSupported(mime)) {
+      mime = 'video/webm;codecs=vp8,opus';
+      if (!MediaRecorder.isTypeSupported(mime)) {
+        mime = 'video/webm';
+      }
+    }
+
+    try {
+      mediaRecorder = new MediaRecorder(canvasStream, { mimeType: mime });
+    } catch (err) {
+      setStatus('MediaRecorder error: ' + err.message);
+      console.error(err);
+      return;
+    }
+
+    mediaRecorder.ondataavailable = (ev) => {
+      if (ev.data && ev.data.size > 0) recordedChunks.push(ev.data);
+    };
+
+    mediaRecorder.onstop = () => {
+      setStatus('Recording stopped. You can download or share the file.');
+    };
+
+    mediaRecorder.start(100); // collect chunks frequently
+    startTimer();
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+    downloadBtn.disabled = true;
+    shareBtn.disabled = true;
+    setStatus('Recording...');
+  }
+
+  function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+    }
+    stopTimer();
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    downloadBtn.disabled = (recordedChunks.length === 0);
+    shareBtn.disabled = (recordedChunks.length === 0);
+  }
+
+  function downloadRecording() {
+    if (!recordedChunks || recordedChunks.length === 0) {
+      alert('No recording available.');
+      return;
+    }
+    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'recording_with_frame.webm';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setStatus('Downloaded recording_with_frame.webm');
+  }
+
+  async function shareRecording() {
+    if (!recordedChunks || recordedChunks.length === 0) {
+      alert('No recording available.');
+      return;
+    }
+    try {
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const file = new File([blob], 'recording_with_frame.webm', { type: blob.type });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'Recording', text: 'My recording with frame' });
+      } else {
+        alert('Sharing not supported on this browser/device. Try downloading instead.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Share error: ' + err.message);
+    }
+  }
+
+  // wire buttons
+  startBtn.addEventListener('click', startRecording);
+  stopBtn.addEventListener('click', stopRecording);
+  downloadBtn.addEventListener('click', downloadRecording);
+  shareBtn.addEventListener('click', shareRecording);
+
+  // cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    if (webcamStream) {
+      webcamStream.getTracks().forEach(t => t.stop());
+    }
+    cancelAnimationFrame(rafId);
+  });
+
+})();
+</script>
 </body>
 </html>
+
+
