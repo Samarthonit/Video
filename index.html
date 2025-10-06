@@ -80,6 +80,13 @@
             box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
         }
 
+        .webcam-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
         .controls {
             display: flex;
             justify-content: center;
@@ -314,11 +321,12 @@
 
 <body>
     <div class="container">
+        <h1>Run For Girl Child</h1>
 
         <div class="recorder-container">
             <img id="frame" src="frame.png" alt="Frame" />
             <div class="webcam-area">
-                <video id="webcam" autoplay muted playsinline></video>
+                <video id="webcam" class="webcam-feed" autoplay muted playsinline></video>
             </div>
             <canvas id="canvas"></canvas>
         </div>
@@ -359,6 +367,7 @@
         let seconds = 0, minutes = 0, hours = 0;
         let isRecording = false;
         let recordingStartTime = 0;
+        let webcamAspectRatio = 16/9; // Default aspect ratio
 
         // Function to get supported MIME types with MP4 priority
         function getSupportedMimeType() {
@@ -385,7 +394,8 @@
                     video: { 
                         width: { ideal: 1280 },
                         height: { ideal: 720 },
-                        frameRate: { ideal: 30, max: 30 }
+                        frameRate: { ideal: 30, max: 30 },
+                        aspectRatio: 16/9
                     },
                     audio: {
                         echoCancellation: true,
@@ -396,6 +406,17 @@
                 });
 
                 webcam.srcObject = stream;
+                
+                // Get actual webcam dimensions and aspect ratio
+                await new Promise(resolve => {
+                    webcam.addEventListener('loadedmetadata', () => {
+                        const track = stream.getVideoTracks()[0];
+                        const settings = track.getSettings();
+                        webcamAspectRatio = settings.width / settings.height;
+                        console.log('Webcam dimensions:', settings.width, 'x', settings.height, 'Aspect ratio:', webcamAspectRatio);
+                        resolve();
+                    });
+                });
                 
                 // Set up canvas with proper dimensions
                 setupCanvas();
@@ -441,8 +462,38 @@
                 const relativeWidth = rect.width * (canvas.width / containerRect.width);
                 const relativeHeight = rect.height * (canvas.height / containerRect.height);
                 
-                // Draw webcam feed in the exact same position and size
-                ctx.drawImage(webcam, relativeX, relativeY, relativeWidth, relativeHeight);
+                // Calculate aspect ratio correct dimensions
+                const containerAspectRatio = relativeWidth / relativeHeight;
+                let drawWidth = relativeWidth;
+                let drawHeight = relativeHeight;
+                let drawX = relativeX;
+                let drawY = relativeY;
+                
+                // Maintain webcam aspect ratio to prevent stretching
+                if (webcamAspectRatio > containerAspectRatio) {
+                    // Webcam is wider than container - fit to width
+                    drawHeight = relativeWidth / webcamAspectRatio;
+                    drawY = relativeY + (relativeHeight - drawHeight) / 2;
+                } else {
+                    // Webcam is taller than container - fit to height
+                    drawWidth = relativeHeight * webcamAspectRatio;
+                    drawX = relativeX + (relativeWidth - drawWidth) / 2;
+                }
+                
+                // Create rounded corners for webcam feed
+                ctx.save();
+                ctx.beginPath();
+                ctx.roundRect(relativeX, relativeY, relativeWidth, relativeHeight, 10);
+                ctx.clip();
+                
+                // Draw webcam feed with correct aspect ratio (no stretching)
+                ctx.drawImage(webcam, drawX, drawY, drawWidth, drawHeight);
+                ctx.restore();
+                
+                // Draw border
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(relativeX, relativeY, relativeWidth, relativeHeight);
             }
             
             requestAnimationFrame(drawComposite);
