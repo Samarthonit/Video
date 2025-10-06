@@ -125,7 +125,6 @@
             color: white;
         }
 
-        /* 🎯 New Share button color */
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
@@ -253,7 +252,6 @@
             <button id="stopBtn" class="btn btn-stop" disabled><i class="fas fa-stop"></i>Stop</button>
             <button id="downloadBtn" class="btn btn-download" disabled><i class="fas fa-download"></i>Download</button>
             <button id="shareBtn" class="btn btn-share" disabled><i class="fas fa-share-alt"></i>Share</button>
-            <!-- ✅ New button -->
         </div>
 
         <div id="status" class="status">Click "Start" to begin recording</div>
@@ -282,7 +280,14 @@
         // Initialize webcam
         async function initWebcam() {
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        frameRate: { ideal: 30 }
+                    }, 
+                    audio: true 
+                });
                 webcam.srcObject = stream;
                 canvas.getContext('2d');
                 requestAnimationFrame(drawComposite);
@@ -310,19 +315,45 @@
             timer.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
 
+        // Get supported MIME type - prioritize MP4
+        function getSupportedMimeType() {
+            const types = [
+                'video/mp4; codecs="avc1.42E01E, mp4a.40.2"', // MP4 with H.264 and AAC
+                'video/webm; codecs="vp9, opus"',
+                'video/webm; codecs="vp8, opus"',
+                'video/webm'
+            ];
+            
+            for (let type of types) {
+                if (MediaRecorder.isTypeSupported(type)) {
+                    console.log('Using MIME type:', type);
+                    return type;
+                }
+            }
+            return 'video/webm'; // Fallback
+        }
+
         // Start recording
         function startRecording() {
             recordedChunks = [];
             const canvasStream = canvas.captureStream(30);
             const audioTrack = stream.getAudioTracks()[0];
             if (audioTrack) canvasStream.addTrack(audioTrack);
-            mediaRecorder = new MediaRecorder(canvasStream);
-            mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+            
+            // Get supported MIME type
+            const mimeType = getSupportedMimeType();
+            const isMp4 = mimeType.includes('mp4');
+            
+            mediaRecorder = new MediaRecorder(canvasStream, { mimeType: mimeType });
+            mediaRecorder.ondataavailable = e => { 
+                if (e.data.size > 0) recordedChunks.push(e.data); 
+            };
             mediaRecorder.onstop = () => {
-                recordingBlob = new Blob(recordedChunks, { type: 'video/webm' });
+                const blobType = isMp4 ? 'video/mp4' : 'video/webm';
+                recordingBlob = new Blob(recordedChunks, { type: blobType });
                 downloadBtn.disabled = false;
                 shareBtn.disabled = false;
-                status.textContent = 'Recording complete. You can download or share.';
+                status.textContent = `Recording complete (${isMp4 ? 'MP4' : 'WebM'}). You can download or share.`;
             };
             mediaRecorder.start();
             isRecording = true;
@@ -333,56 +364,55 @@
         }
 
         // Stop recording
-        // Stop recording (fixed version)
         function stopRecording() {
             if (mediaRecorder && mediaRecorder.state === 'recording') {
-                status.textContent = 'Finalizing recording... please wait a moment.';
-
-                // 🧩 Flush last video data before stopping
-                mediaRecorder.requestData();
-
-                // 🕐 Wait a bit so metadata finishes writing
-                setTimeout(() => {
-                    mediaRecorder.stop();
-                    clearInterval(timerInterval);
-                    recordingIndicator.style.display = 'none';
-                    startBtn.disabled = false;
-                    stopBtn.disabled = true;
-                    status.textContent = 'Recording stopped. Processing complete.';
-                }, 800); // You can change to 500–1000 ms
+                mediaRecorder.stop();
+                clearInterval(timerInterval);
+                recordingIndicator.style.display = 'none';
+                startBtn.disabled = false; stopBtn.disabled = true;
+                status.textContent = 'Recording stopped.';
             }
         }
-
 
         // Download video
         function downloadRecording() {
             if (recordingBlob) {
+                const isMp4 = recordingBlob.type.includes('mp4');
+                const extension = isMp4 ? 'mp4' : 'webm';
                 const url = URL.createObjectURL(recordingBlob);
                 const a = document.createElement('a');
-                a.href = url; a.download = 'recording.webm';
-                a.click(); URL.revokeObjectURL(url);
+                a.href = url; 
+                a.download = `recording.${extension}`;
+                a.click(); 
+                URL.revokeObjectURL(url);
                 showNotification();
             }
         }
 
-        // ✅ Share video using Web Share API
+        // Share video using Web Share API
         async function shareRecording() {
             if (!recordingBlob) return alert('No recording available to share!');
 
-            const file = new File([recordingBlob], 'recording.webm', { type: 'video/webm' });
+            const isMp4 = recordingBlob.type.includes('mp4');
+            const extension = isMp4 ? 'mp4' : 'webm';
+            const file = new File([recordingBlob], `recording.${extension}`, { type: recordingBlob.type });
+            
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 try {
                     await navigator.share({
-                        title: 'My Webcam Recording',
-                        text: 'Check out this video I recorded!',
+                        title: 'Run For Girl Child Recording',
+                        text: 'Check out my recording for Run For Girl Child!',
                         files: [file]
                     });
                     status.textContent = 'Recording shared successfully!';
                 } catch (err) {
                     console.error('Share cancelled or failed:', err);
+                    if (err.name !== 'AbortError') {
+                        status.textContent = 'Sharing failed. Try downloading instead.';
+                    }
                 }
             } else {
-                alert('Sharing not supported on this browser/device.');
+                alert('Sharing not supported on this browser/device. Please download the video instead.');
             }
         }
 
@@ -402,5 +432,4 @@
 </body>
 
 </html>
-
 
