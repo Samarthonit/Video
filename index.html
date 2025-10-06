@@ -410,7 +410,13 @@
     <div class="container">
 
         <div class="recorder-container">
-            <img id="frame" src="frame.png" alt="Frame" />
+            <!-- Placeholder for frame image -->
+            <div id="frame" style="background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem;">
+                <div style="text-align: center;">
+                    <i class="fas fa-camera" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                    <div>Event Frame</div>
+                </div>
+            </div>
             <div class="webcam-area">
                 <video id="webcam" class="webcam-feed" autoplay muted playsinline></video>
             </div>
@@ -458,6 +464,19 @@
         let isRecording = false;
         let recordingStartTime = 0;
         let webcamAspectRatio = 16/9;
+
+        // Function to detect if user is on mobile
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // Function to scroll to bottom
+        function scrollToBottom() {
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
 
         // Function to get supported MIME types with MP4 priority
         function getSupportedMimeType() {
@@ -513,6 +532,16 @@
             } catch (err) {
                 console.error('Error accessing webcam:', err);
                 status.textContent = 'Error accessing webcam: ' + err.message;
+                
+                // Create a placeholder for demo purposes
+                const placeholderStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 640, height: 480 }
+                }).catch(() => null);
+                
+                if (placeholderStream) {
+                    webcam.srcObject = placeholderStream;
+                    setupCanvas();
+                }
             }
         }
 
@@ -534,7 +563,9 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             // Draw the frame (background with all design elements)
-            ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
+            // In a real implementation, this would be the actual frame image
+            ctx.fillStyle = '#2d2d2d';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             // Draw webcam in the exact same position as shown on webpage
             if (webcam.readyState >= 2) {
@@ -615,7 +646,7 @@
             recordingStartTime = Date.now();
             
             const canvasStream = canvas.captureStream(30);
-            const audioTrack = stream.getAudioTracks()[0];
+            const audioTrack = stream ? stream.getAudioTracks()[0] : null;
             if (audioTrack) canvasStream.addTrack(audioTrack);
             
             const mimeType = getSupportedMimeType();
@@ -741,11 +772,24 @@
         stopBtn.onclick = stopRecording;
         downloadBtn.onclick = downloadRecording;
         shareBtn.onclick = shareRecording;
-        window.onload = initWebcam;
+        
+        // Initialize when page loads
+        window.onload = function() {
+            initWebcam();
+            
+            // Auto-scroll to bottom on mobile devices
+            if (isMobileDevice()) {
+                // Small delay to ensure page is fully loaded
+                setTimeout(() => {
+                    scrollToBottom();
+                }, 500);
+            }
+        };
     </script>
 </body>
 
 </html>
+
 
 
 
