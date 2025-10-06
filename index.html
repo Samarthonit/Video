@@ -27,6 +27,9 @@
       width: 100%;
       max-width: 480px;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
     }
 
     h1 {
@@ -42,12 +45,14 @@
       overflow: hidden;
       box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
       background-color: #000;
+      aspect-ratio: 9/16; /* Maintain frame aspect ratio */
     }
 
     #frame {
       width: 100%;
-      height: auto;
+      height: 100%;
       display: block;
+      object-fit: cover;
     }
 
     #webcam {
@@ -85,12 +90,12 @@
       display: flex;
       justify-content: center;
       gap: 10px;
-      margin: 15px 0;
+      margin: 0;
       flex-wrap: wrap;
     }
 
     .btn {
-      padding: 12px 24px;
+      padding: 12px 20px;
       border: none;
       border-radius: 40px;
       font-size: 1rem;
@@ -101,7 +106,9 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      min-width: 130px;
+      flex: 1;
+      min-width: 120px;
+      max-width: 140px;
     }
 
     .btn i {
@@ -118,7 +125,7 @@
     .btn:disabled { background: #555; cursor: not-allowed; transform: none; box-shadow: none; }
 
     .timer-container {
-      margin: 15px 0;
+      margin: 0;
       font-size: 1.4rem;
       font-weight: bold;
       display: flex;
@@ -146,7 +153,7 @@
     }
 
     .status {
-      margin: 15px 0;
+      margin: 0;
       padding: 12px;
       border-radius: 10px;
       background: linear-gradient(45deg, rgba(255, 107, 107, 0.2), rgba(255, 193, 7, 0.2));
@@ -175,16 +182,91 @@
 
     /* Mobile optimization */
     @media (max-width: 600px) {
-      body { padding: 8px; }
-      h1 { font-size: 1.5rem; margin-bottom: 5px; }
+      body { 
+        padding: 8px;
+        justify-content: center;
+        min-height: 100vh;
+        height: 100vh;
+        overflow: hidden;
+      }
+      
+      .container {
+        max-width: 100%;
+        height: 100%;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      
+      h1 { 
+        font-size: 1.5rem; 
+        margin-bottom: 5px;
+        flex-shrink: 0;
+      }
+      
+      .recorder-container {
+        flex: 1;
+        max-height: 60vh;
+        min-height: 0;
+      }
+      
       .webcam-area {
         top: 27%;
         left: 10%;
         width: 80%;
         height: 43%;
       }
-      .btn { padding: 10px 18px; font-size: 0.9rem; min-width: 110px; }
-      .timer-container { font-size: 1.2rem; }
+      
+      .controls {
+        flex-direction: row;
+        gap: 8px;
+        flex-wrap: nowrap;
+        flex-shrink: 0;
+        margin-top: 10px;
+      }
+      
+      .btn { 
+        padding: 10px 12px;
+        font-size: 0.85rem;
+        min-width: 0;
+        max-width: none;
+        flex: 1;
+      }
+      
+      .btn i {
+        font-size: 0.9rem;
+      }
+      
+      .timer-container { 
+        font-size: 1.2rem;
+        padding: 8px 16px;
+        flex-shrink: 0;
+      }
+      
+      .status {
+        font-size: 0.9rem;
+        padding: 10px;
+        flex-shrink: 0;
+      }
+    }
+
+    /* For very small screens */
+    @media (max-width: 350px) {
+      .container {
+        max-width: 100%;
+      }
+      
+      .btn {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+      }
+      
+      .btn i {
+        font-size: 0.8rem;
+      }
+      
+      .timer-container {
+        font-size: 1.1rem;
+      }
     }
   </style>
 </head>
@@ -450,6 +532,7 @@
   </script>
 </body>
 </html>
+
 
 
 
