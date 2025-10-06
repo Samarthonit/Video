@@ -410,13 +410,8 @@
     <div class="container">
 
         <div class="recorder-container">
-            <!-- Placeholder for frame image -->
-            <div id="frame" style="background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem;">
-                <div style="text-align: center;">
-                    <i class="fas fa-camera" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                    <div>Event Frame</div>
-                </div>
-            </div>
+            <!-- ACTUAL FRAME IMAGE -->
+            <img id="frame" src="frame.png" alt="Event Frame" />
             <div class="webcam-area">
                 <video id="webcam" class="webcam-feed" autoplay muted playsinline></video>
             </div>
@@ -563,9 +558,7 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             // Draw the frame (background with all design elements)
-            // In a real implementation, this would be the actual frame image
-            ctx.fillStyle = '#2d2d2d';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
             
             // Draw webcam in the exact same position as shown on webpage
             if (webcam.readyState >= 2) {
@@ -789,8 +782,5 @@
 </body>
 
 </html>
-
-
-
 
 
