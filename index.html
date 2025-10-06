@@ -83,16 +83,24 @@
         .webcam-feed {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain; /* Changed from cover to contain to maintain aspect ratio */
             border-radius: 10px;
+            background-color: #000; /* Add black background for letterboxing */
         }
 
         .controls {
             display: flex;
-            justify-content: center;
-            gap: 8px;
+            flex-direction: column;
+            gap: 10px;
             margin: 0;
-            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
         }
 
         .btn {
@@ -109,7 +117,6 @@
             gap: 6px;
             flex: 1;
             min-width: 0;
-            max-width: 140px;
             min-height: 48px;
         }
 
@@ -255,15 +262,16 @@
             }
 
             .controls {
-                gap: 6px;
-                flex-wrap: nowrap;
+                gap: 8px;
+            }
+
+            .button-row {
+                gap: 8px;
             }
 
             .btn {
                 padding: 10px 12px;
                 font-size: 0.9rem;
-                min-width: 0;
-                max-width: none;
                 min-height: 44px;
             }
 
@@ -300,7 +308,11 @@
             }
 
             .controls {
-                gap: 4px;
+                gap: 6px;
+            }
+
+            .button-row {
+                gap: 6px;
             }
         }
 
@@ -321,7 +333,6 @@
 
 <body>
     <div class="container">
-        <h1>Run For Girl Child</h1>
 
         <div class="recorder-container">
             <img id="frame" src="frame.png" alt="Frame" />
@@ -337,10 +348,14 @@
         </div>
 
         <div class="controls">
-            <button id="startBtn" class="btn btn-start"><i class="fas fa-record-vinyl"></i>Start</button>
-            <button id="stopBtn" class="btn btn-stop" disabled><i class="fas fa-stop"></i>Stop</button>
-            <button id="downloadBtn" class="btn btn-download" disabled><i class="fas fa-download"></i>Download</button>
-            <button id="shareBtn" class="btn btn-share" disabled><i class="fas fa-share-alt"></i>Share</button>
+            <div class="button-row">
+                <button id="startBtn" class="btn btn-start"><i class="fas fa-record-vinyl"></i>Start</button>
+                <button id="stopBtn" class="btn btn-stop" disabled><i class="fas fa-stop"></i>Stop</button>
+            </div>
+            <div class="button-row">
+                <button id="downloadBtn" class="btn btn-download" disabled><i class="fas fa-download"></i>Download</button>
+                <button id="shareBtn" class="btn btn-share" disabled><i class="fas fa-share-alt"></i>Share</button>
+            </div>
         </div>
 
         <div id="status" class="status">Click "Start" to begin recording</div>
@@ -462,22 +477,22 @@
                 const relativeWidth = rect.width * (canvas.width / containerRect.width);
                 const relativeHeight = rect.height * (canvas.height / containerRect.height);
                 
-                // Calculate aspect ratio correct dimensions
+                // Calculate aspect ratio correct dimensions to FILL the entire area
                 const containerAspectRatio = relativeWidth / relativeHeight;
                 let drawWidth = relativeWidth;
                 let drawHeight = relativeHeight;
                 let drawX = relativeX;
                 let drawY = relativeY;
                 
-                // Maintain webcam aspect ratio to prevent stretching
+                // Maintain webcam aspect ratio but FILL the entire area (crop if needed)
                 if (webcamAspectRatio > containerAspectRatio) {
-                    // Webcam is wider than container - fit to width
-                    drawHeight = relativeWidth / webcamAspectRatio;
-                    drawY = relativeY + (relativeHeight - drawHeight) / 2;
-                } else {
-                    // Webcam is taller than container - fit to height
+                    // Webcam is wider than container - fit to height (crop sides)
                     drawWidth = relativeHeight * webcamAspectRatio;
                     drawX = relativeX + (relativeWidth - drawWidth) / 2;
+                } else {
+                    // Webcam is taller than container - fit to width (crop top/bottom)
+                    drawHeight = relativeWidth / webcamAspectRatio;
+                    drawY = relativeY + (relativeHeight - drawHeight) / 2;
                 }
                 
                 // Create rounded corners for webcam feed
@@ -486,7 +501,7 @@
                 ctx.roundRect(relativeX, relativeY, relativeWidth, relativeHeight, 10);
                 ctx.clip();
                 
-                // Draw webcam feed with correct aspect ratio (no stretching)
+                // Draw webcam feed to FILL the entire area (may crop parts of the webcam)
                 ctx.drawImage(webcam, drawX, drawY, drawWidth, drawHeight);
                 ctx.restore();
                 
